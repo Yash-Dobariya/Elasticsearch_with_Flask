@@ -1,0 +1,39 @@
+version: '3'
+services:
+
+  flask_app:
+    build:
+      context: .
+    container_name: flask_app
+    command: flask run --host=0.0.0.0 --port=5000 --reload --debugger
+    ports:
+      - "5000:5000"
+    depends_on:
+      - elasticsearch
+    networks:
+      - my-network
+
+  kibana:
+    image: kibana:7.17.9
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - my-network
+
+  elasticsearch:
+    image: elasticsearch:7.17.9
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - my-network
+
+networks:
+  my-network:
